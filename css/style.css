@@ -1,0 +1,228 @@
+body {
+    font-family: 'Source Code Pro', monospace;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+}
+
+#tape {
+    /* position: fixed; */
+    /* top: 50%; */
+    left: 0;
+    min-width: 100%;
+    height: 50px;
+    margin-top: -25px;
+    /* vertical centering */
+    background-color: white;
+    text-align: center;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+#tape>.symbols-wrapper {
+    width: 300px;
+    overflow: hidden;
+    margin: 0 auto;
+    text-align: center;
+    overflow: hidden;
+    -webkit-transition: -webkit-transform 0.1s ease;
+    transition: -webkit-transform 0.1s ease;
+    transition: transform 0.1s ease;
+    transition: transform 0.1s ease, -webkit-transform 0.1s ease;
+    -webkit-transform: translateX(-1px);
+            transform: translateX(-1px);
+    /* initial position */
+}
+
+#tape>.symbols-wrapper>.symbol {
+    width: 50px;
+    height: 50px;
+    float: left;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+    border-left: 1px solid gray;
+    line-height: 50px;
+    text-align: center;
+    font-size: 1.3em;
+}
+
+#tape>.symbols-wrapper>.symbol:last-of-type {
+    border-right: 1px solid gray;
+}
+
+#tape>.symbols-wrapper>.symbol.blank {
+    color: lightgray;
+}
+
+#tape>.symbols-wrapper>.symbol.highlight {
+    color: red;
+}
+
+.current-state {
+    color: red;
+}
+
+/* #description { */
+/*     position: fixed; */
+/*     top: 15px; */
+/*     padding: 10px; */
+/*     text-align: center; */
+/* } */
+
+@media (min-width: 500px) {
+    #description {
+        left: 50%;
+        width: 500px;
+        margin-left: -250px;
+    }
+}
+
+#description>.state {
+    margin-top: 10px;
+    display: block;
+}
+
+#description>.state.success {
+    color: green;
+}
+
+#description>.state.fail {
+    color: red;
+}
+
+#hint {
+    position: fixed;
+    bottom: 15px;
+    padding: 10px;
+    text-align: center;
+}
+
+@media (min-width: 500px) {
+    #hint {
+        left: 50%;
+        width: 500px;
+        margin-left: -250px;
+    }
+}
+
+@media (max-width: 899px) {
+    #editor {
+        display: none;
+    }
+}
+
+#editor {
+    position: fixed;
+    top: 0;
+    right: -850px;
+    width: 900px;
+    height: 100%;
+    border-left: 1px solid black;
+    background-color: #222;
+    color: white;
+    z-index: 2;
+    -webkit-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+    overflow: scroll;
+}
+
+#editor h2 {
+    color: white;
+}
+
+#editor>a.banner {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    margin-top: -115px;
+    width: 50px;
+    height: 300px;
+    line-height: 50px;
+    z-index: 3;
+    text-align: center;
+    text-decoration: none;
+    float: left;
+    line-height: 270px;
+    color: darkgray;
+}
+
+#editor>a.banner:hover {
+    color: white;
+    font-weight: 400;
+}
+
+#editor>a.banner>span {
+    text-decoration: none;
+    display: block;
+    -webkit-transform: rotateZ(-90deg);
+            transform: rotateZ(-90deg);
+    -webkit-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#editor>.transition-table-wrapper {
+    max-width: 100%;
+    padding: 0;
+    margin: 100px 0 0;
+    text-align: center;
+}
+
+#editor>.transition-table-wrapper>table {
+    table-layout: auto;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+#editor>.transition-table-wrapper>table td, th {
+    border: 0;
+    border-collapse: collapse;
+}
+
+#editor>.transition-table-wrapper>table tr:nth-child(2n) td, #editor>.transition-table-wrapper>table tr:nth-child(2n) th {
+    background-color: #2b2b2b;
+}
+
+#editor>.transition-table-wrapper>table tr td span {
+    color: darkgray;
+}
+
+#editor>.transition-table-wrapper>table td, #editor>.transition-table-wrapper>table th {
+    margin: 0;
+    padding: 8px 20px;
+}
+
+#editor>.transition-table-wrapper>table>thead th {
+    background-color: #444;
+}
+
+#editor .machine-input {
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+#editor input {
+    background: #444;
+    border: 1px solid #333;
+    padding: 10px;
+    color: #aaa;
+    font-size: 1em;
+}
+
+#editor td input {
+    width: 50px;
+}
+
+#set-transitions {
+    display: none;
+}
+
+#add-state {
+    color: white;
+    text-decoration: none;
+    -webkit-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#add-state:hover {
+    color: lightblue;
+}

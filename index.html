@@ -1,0 +1,319 @@
+<!doctype html>
+<html><head>
+	<title>Universal Automata Simulation</title>
+  <link href="css/style.css" rel="stylesheet" media="all" type="text/css" />
+  <meta charset="utf-8">
+  <meta property="og:image" content="http://automata.rf.gd/turingMachine.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="400">
+  <meta property="og:image:height" content="274">
+	<style>
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+
+.btn-group-sm>.btn, .btn-sm {
+    padding: 4px 10px 5px;
+    font-size: 14px;
+    line-height: 1.5;
+    border-radius: 9999px;
+}
+
+.btn-success {
+    color: #fff;
+    background-color: #138a07;
+    border-color: transparent;
+}
+.btn {
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 700;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 0 solid transparent;
+    white-space: nowrap;
+    padding: 4px 16px 5px;
+    font-size: 16px;
+    line-height: 1.5625;
+    border-radius: 9999px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+body {
+	text-align: center;
+	background: #DFDFDF;
+	margin: 0 30px 100px 30px;
+	font: 14px/18px 'Lucida Grande', 'Segoe UI', sans-serif;
+}
+
+h1 {
+	font: bold italic 50px Georgia, serif;
+}
+
+canvas {
+	display: block;
+	/* max-width: 800px; */
+	background: white;
+	border-radius: 20px;
+	-moz-border-radius: 20px;
+	margin: 10px auto;
+}
+
+a {
+	color: black;
+}
+
+.tm {
+
+}
+
+.at {
+	margin: 30px auto;
+	text-align: left;
+	max-width: 800px;
+}
+
+.error {
+	display: block;
+	color: red;
+	font-size: 28px;
+	line-height: 30px;
+	padding: 30px;
+}
+
+p {
+	margin: 30px 0;
+	line-height: 20px;
+}
+
+.center {
+	text-align: center;
+}
+
+textarea {
+	display: none;
+	width: 75%;
+	height: 400px;
+	margin: 0 auto;
+}
+
+  </style>
+	<script src="fsm.js"></script>
+	<script>
+
+if (typeof btoa == 'undefined') {
+    function btoa(str) {
+        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+        var encoded = [];
+        var c = 0;
+        while (c < str.length) {
+            var b0 = str.charCodeAt(c++);
+            var b1 = str.charCodeAt(c++);
+            var b2 = str.charCodeAt(c++);
+            var buf = (b0 << 16) + ((b1 || 0) << 8) + (b2 || 0);
+            var i0 = (buf & (63 << 18)) >> 18;
+            var i1 = (buf & (63 << 12)) >> 12;
+            var i2 = isNaN(b1) ? 64 : (buf & (63 << 6)) >> 6;
+            var i3 = isNaN(b2) ? 64 : (buf & 63);
+            encoded[encoded.length] = chars.charAt(i0);
+            encoded[encoded.length] = chars.charAt(i1);
+            encoded[encoded.length] = chars.charAt(i2);
+            encoded[encoded.length] = chars.charAt(i3);
+        }
+        return encoded.join('');
+    }
+}
+
+function changeCanvasSize() {
+  var canvas=document.getElementById('canvas');
+  if(canvas.width==800){
+    canvas.width=1920;
+    canvas.height=1080;
+  }else{
+    canvas.width=800;
+    canvas.height=600;
+  }
+}
+	</script>
+</head><body>
+	<h1>Universal Automata Simulation</h1>
+  <button onclick="changeCanvasSize();">Change Size</button>
+	<canvas id="canvas" width="800" height="600">
+		<span class="error">Your browser does not support<br>the HTML5 &lt;canvas&gt; element</span>
+	</canvas>
+	<div class="at" id="contentDiv">
+		<p class="center" id="exportPanel">Export as: 
+    <a href="javascript:saveAsPNG()">PNG</a> 
+     | <a href="javascript:saveAsSVG()">SVG</a> 
+     | <a href="javascript:saveAsText()">Text</a>
+     | <a href="javascript:saveAsLaTeX()">LaTeX</a>
+     | <a href="javascript:share()">Share</a>
+    </p>
+		<p class="center" id="simulatePanel">Simulate: 
+     <a href="javascript:simulateTuringDet()">Run Turing</a>
+     | <a href="javascript:simulateDFA()">Run DFA</a>
+     | <a href="javascript:simulateNFA()">Run NFA</a>
+     <!-- | <a href="javascript:saveAsLaTeX2()">LaTeX2</a> -->
+    </p>
+    <div id="outputPanel">
+    <center>
+      <input id="tapeInput" title="tape for turing machine / word for automata" value="0" style="display:block;">
+      Blank: <input id="blank symbol" value="#" size=1 onchange="document.blank=this.value;console.log('new blank: '+document.blank)"><br>
+      <textarea id="bulkInput" style="display:none;">0</textarea>
+      Bulk test:
+      <label class="switch">
+        <input type="checkbox" id="bulkCheck" onclick="changeBulk();" unchecked>
+        <span class="slider round"></span>
+      </label>
+    </center>
+<form class="center" action="https://www.overleaf.com/docs" method="post" target="_blank">
+<textarea id="output" name="snip" readonly></textarea>
+<center>
+<input type="submit" value="Open in Overleaf" id="overleafExport" style="display:none;" class="btn-success btn btn-sm">
+</center>
+</form>
+    </div>
+
+<br><br>
+<div class="tm">
+      Current state: <span class="current-state">0</span><br/>
+      Step: <span class="counter">0</span><br>
+      <span class="state"></span><br/><br><br>
+  <section id="tape">
+      <div class="symbols-wrapper tm"></div>
+      <svg width="50" height="50">
+          <polygon points="0,25 25,0 50,25" style="fill:white;stroke:black;stroke-width:1" />
+          <text x="15" y="20" fill="red">0</text>
+      </svg>
+  </section><br><br>
+  <aside id="editor">
+      <div class="transition-table-wrapper tm">
+          <h2>Transition table</h2>
+          <table class="transition-table">
+              <thead></thead>
+              <tbody></tbody>
+          </table>
+          <a href="#" id="add-state" style="display:none;">&plus; Add state</a>
+          <input type="submit" id="set-transitions" value="Save transition table" style="display:none;" />
+          <div class="machine-input tm" style="display:none">
+              <form>
+                  <label for="machine-input">Input</label>
+                  <input type="text" name="machine-input" id="machine-input" pattern="[A-Za-z]+" required />
+                  <input type="submit" id="reset" value="Reset" />
+              </form>
+          </div>
+      </div>
+      <a href="#" class="banner"><span>State&nbsp;Table</span></a>
+  </aside>
+      Press <a id="space" href="#">"."</a> to move to the next state.
+  <script src="script.js" type="application/javascript"></script>
+</div>
+<br>
+<h3>Url shortener</h3>
+<form action="https://tinyurl.com/create.php" target="_blank" method="get" name="tinyurlform" id="tinyurlform" class="create-form" style="background:#E7E7F7;">
+    <input type="hidden" id="source" name="source" value="create">
+    <input type="text" id="longurl" name="url" value="">
+    <input type="submit" value="Make TinyURL!">
+    <br>Custom alias (optional):<br>
+    <tt class="basecontent">https://tinyurl.com</tt>
+    <input type="text" id="alias" name="alias" value="" maxlength="30"><br>
+    <small>May contain letters, numbers, and dashes.</small>
+</form>
+
+		<h3>Here's how to use it:</h3>
+		<ul>
+			<li><b>Add a state:</b> double-click on the canvas</li>
+			<li><b>Add an arrow:</b> shift-drag on the canvas</li>
+			<li><b>Move something:</b> drag it around</li>
+			<li><b>Delete something:</b> click it and press the delete key (not the backspace key)</li>
+			<li><b>Save:</b> use the share option</li>
+		</ul><ul>
+			<li><b>Make accept state:</b> double-click on an existing state</li>
+			<li><b>Type numeric subscript:</b> put an underscore before the number (like "S_0")</li>
+			<li><b>Type greek letter:</b> put a backslash before it (like "\beta")</li>
+		</ul><ul>
+			<li><b>Make start state:</b> name a state 'S'</li>
+			<li><b>Run automata:</b> write a word or tape configuration in the input field and simulate.</li>
+			<li><b>Run turing machine:</b> write the transitions in the format 'read;write,move' (blank is #)</li>
+			<li><b>Multiple transitions:</b> for multiple transitions on one edge write "\\"</li>
+		</ul>
+		<p>Future-Feature:</p>
+		<ul>
+			<!-- <li><b>Import:</b> import from common description</li> -->
+			<li><b>Save:</b> save your work on the server</li>
+			<!-- <li><b>Turing Tape:</b> a nice visual representation of the turing machine</li> -->
+			<!-- <li><b>Formal Format:</b> export to table</li> -->
+		</ul>
+		<p>Examples:</p>
+		<ul>
+      <li><a href="?code=%5B%5B%7B%22x%22:106,%22y%22:285,%22mouseOffsetX%22:-19,%22mouseOffsetY%22:9,%22isAcceptState%22:false,%22text%22:%22S%22%7D,%7B%22x%22:296,%22y%22:285,%22mouseOffsetX%22:0,%22mouseOffsetY%22:0,%22isAcceptState%22:false,%22text%22:%22End%22%7D%5D,%5B%7B%22sort%22:0,%22node%22:0,%22angle%22:-1.5707963267948966,%22mouseOffset%22:0,%22mouse%22:%7B%22x%22:122,%22y%22:261%7D,%22text%22:%220;1,r%5C%5C%5C%5C1;0,r%22%7D,%7B%22sort%22:1,%22nodeA%22:0,%22nodeB%22:1,%22lineAngleAdjust%22:0,%22parallelPart%22:0.5,%22perpendicularPart%22:0,%22text%22:%22#;#,n%22%7D%5D%5D">Binary Inverter TM</a></li>
+      <li><a href="?code=%5B%5B%7B%22x%22:92,%22y%22:105,%22mouseOffsetX%22:-1,%22mouseOffsetY%22:-8,%22isAcceptState%22:false,%22text%22:%22S%22%7D,%7B%22x%22:359,%22y%22:142,%22mouseOffsetX%22:-12,%22mouseOffsetY%22:-8,%22isAcceptState%22:false,%22text%22:%22toStart%22%7D,%7B%22x%22:542,%22y%22:111,%22mouseOffsetX%22:-10,%22mouseOffsetY%22:0,%22isAcceptState%22:false,%22text%22:%22read0%22%7D,%7B%22x%22:650,%22y%22:300,%22mouseOffsetX%22:-11,%22mouseOffsetY%22:0,%22isAcceptState%22:false,%22text%22:%22goBack%22%7D,%7B%22x%22:484,%22y%22:364,%22mouseOffsetX%22:-12,%22mouseOffsetY%22:2,%22isAcceptState%22:false,%22text%22:%22read1%22%7D,%7B%22x%22:316,%22y%22:364,%22mouseOffsetX%22:8,%22mouseOffsetY%22:-8,%22isAcceptState%22:false,%22text%22:%22trans%22%7D,%7B%22x%22:139,%22y%22:319,%22mouseOffsetX%22:-7,%22mouseOffsetY%22:2,%22isAcceptState%22:false,%22text%22:%22left%22%7D%5D,%5B%7B%22sort%22:0,%22node%22:1,%22angle%22:-1.7359450042095235,%22mouseOffset%22:0,%22text%22:%22%7C;%7C,r%22%7D,%7B%22sort%22:1,%22nodeA%22:0,%22nodeB%22:1,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.4397434271322184,%22perpendicularPart%22:0,%22text%22:%22%7C;#,r%22%7D,%7B%22sort%22:1,%22nodeA%22:1,%22nodeB%22:2,%22lineAngleAdjust%22:0,%22parallelPart%22:0.5,%22perpendicularPart%22:0,%22text%22:%220;a,r%22%7D,%7B%22sort%22:0,%22node%22:2,%22angle%22:-1.5707963267948966,%22mouseOffset%22:0,%22text%22:%220;0,r%5C%5C%5C%5C1;1,r%22%7D,%7B%22sort%22:1,%22nodeA%22:2,%22nodeB%22:3,%22lineAngleAdjust%22:0,%22parallelPart%22:0.26571875444333853,%22perpendicularPart%22:0,%22text%22:%22#;d,l%22%7D,%7B%22sort%22:0,%22node%22:3,%22angle%22:0,%22mouseOffset%22:-0.12246105741734144,%22text%22:%220;0,l%5C%5C%5C%5C1;1,l%22%7D,%7B%22sort%22:1,%22nodeA%22:1,%22nodeB%22:4,%22lineAngleAdjust%22:0,%22parallelPart%22:0.5,%22perpendicularPart%22:0,%22text%22:%221;b,r%22%7D,%7B%22sort%22:0,%22node%22:4,%22angle%22:2.347911634002068,%22mouseOffset%22:0.1367588421363286,%22text%22:%220;0,r%5C%5C%5C%5C1;1,r%22%7D,%7B%22sort%22:1,%22nodeA%22:4,%22nodeB%22:3,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.1641955835962145,%22perpendicularPart%22:0,%22text%22:%22#;c,l%22%7D,%7B%22sort%22:0,%22node%22:4,%22angle%22:0.7640207592156939,%22mouseOffset%22:0.4152497556317869,%22text%22:%22c;c,r%5C%5C%5C%5Cd;d,r%22%7D,%7B%22sort%22:0,%22node%22:2,%22angle%22:-0.1857331244855494,%22mouseOffset%22:-0.11542666036692495,%22text%22:%22c;c,r%5C%5C%5C%5Cd;d,r%22%7D,%7B%22sort%22:1,%22nodeA%22:1,%22nodeB%22:5,%22lineAngleAdjust%22:0,%22parallelPart%22:0.5,%22perpendicularPart%22:0,%22text%22:%22c;0,r%5C%5C%5C%5Cd;1,r%22%7D,%7B%22sort%22:0,%22node%22:5,%22angle%22:1.7917369384295387,%22mouseOffset%22:-5.9596648431266495,%22text%22:%22c;0,r%5C%5C%5C%5Cd;1,r%22%7D,%7B%22sort%22:1,%22nodeA%22:5,%22nodeB%22:6,%22lineAngleAdjust%22:0,%22parallelPart%22:0.5,%22perpendicularPart%22:0,%22text%22:%22#;#,l%22%7D,%7B%22sort%22:0,%22node%22:6,%22angle%22:2.7835002692159674,%22mouseOffset%22:0.20599133667583125,%22text%22:%220;0,l%5C%5C%5C%5C1;1,l%22%7D,%7B%22sort%22:0,%22node%22:6,%22angle%22:1.5707963267948966,%22mouseOffset%22:0.15052486912919383,%22text%22:%22%7C;%7C,l%22%7D,%7B%22sort%22:1,%22nodeA%22:6,%22nodeB%22:0,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.4328389587553993,%22perpendicularPart%22:0,%22text%22:%22#;#,r%22%7D,%7B%22sort%22:1,%22nodeA%22:3,%22nodeB%22:1,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.47541750905225943,%22perpendicularPart%22:0,%22text%22:%22a;0,r%5C%5C%5C%5Cb;1,r%22%7D,%7B%22sort%22:0,%22node%22:3,%22angle%22:-1.3567812158510135,%22mouseOffset%22:-0.172860606787145,%22mouse%22:%7B%22x%22:745,%22y%22:156%7D,%22text%22:%22c;c,l%5C%5C%5C%5Cd;d,l%22%7D,%7B%22sort%22:1,%22nodeA%22:1,%22nodeB%22:6,%22lineAngleAdjust%22:0,%22parallelPart%22:0.4824284626264824,%22perpendicularPart%22:0,%22text%22:%22#;0,l%22%7D%5D%5D">Thue Morse</a> (<a href="https://en.wikipedia.org/wiki/Thue%E2%80%93Morse_sequence">Wikipedia</a>)</li>
+      <li>divisible by 3 <a href="?code=%5B%5B%7B%22x%22:129,%22y%22:263,%22mouseOffsetX%22:-9,%22mouseOffsetY%22:20,%22isAcceptState%22:true,%22text%22:%22S%22%7D,%7B%22x%22:306,%22y%22:263,%22mouseOffsetX%22:-21,%22mouseOffsetY%22:-3,%22isAcceptState%22:false,%22text%22:%221%22%7D,%7B%22x%22:475,%22y%22:263,%22mouseOffsetX%22:5,%22mouseOffsetY%22:-6,%22isAcceptState%22:false,%22text%22:%222%22%7D%5D,%5B%7B%22sort%22:0,%22node%22:0,%22angle%22:-1.5707963267948966,%22mouseOffset%22:0,%22mouse%22:%7B%22x%22:129,%22y%22:251%7D,%22text%22:%220%22%7D,%7B%22sort%22:1,%22nodeA%22:0,%22nodeB%22:1,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.5438822922044398,%22perpendicularPart%22:-31.83268889996511,%22text%22:%221%22%7D,%7B%22sort%22:1,%22nodeA%22:1,%22nodeB%22:0,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.49651522973670625,%22perpendicularPart%22:-17.01833260961732,%22text%22:%221%22%7D,%7B%22sort%22:1,%22nodeA%22:1,%22nodeB%22:2,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.5008617523239058,%22perpendicularPart%22:-22.521627750989065,%22text%22:%220%22%7D,%7B%22sort%22:1,%22nodeA%22:2,%22nodeB%22:1,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.5325443786982249,%22perpendicularPart%22:-25,%22text%22:%220%22%7D,%7B%22sort%22:0,%22node%22:2,%22angle%22:-1.5707963267948966,%22mouseOffset%22:0,%22mouse%22:%7B%22x%22:475,%22y%22:252%7D,%22text%22:%221%22%7D%5D%5D">binary</a> <a href="?code=%5B%5B%7B%22x%22:94,%22y%22:252,%22mouseOffsetX%22:2,%22mouseOffsetY%22:-1,%22isAcceptState%22:true,%22text%22:%22S%22%7D,%7B%22x%22:374,%22y%22:258,%22mouseOffsetX%22:6,%22mouseOffsetY%22:-6,%22isAcceptState%22:false,%22text%22:%221%22%7D,%7B%22x%22:243,%22y%22:446,%22mouseOffsetX%22:-6,%22mouseOffsetY%22:17,%22isAcceptState%22:false,%22text%22:%222%22%7D%5D,%5B%7B%22sort%22:0,%22node%22:0,%22angle%22:-1.5707963267948966,%22mouseOffset%22:0,%22mouse%22:%7B%22x%22:124,%22y%22:267%7D,%22text%22:%220,3,6,9%22%7D,%7B%22sort%22:0,%22node%22:1,%22angle%22:-1.4056476493802699,%22mouseOffset%22:0,%22mouse%22:%7B%22x%22:365,%22y%22:259%7D,%22text%22:%220,3,6,9%22%7D,%7B%22sort%22:0,%22node%22:2,%22angle%22:1.4536875822280324,%22mouseOffset%22:0,%22mouse%22:%7B%22x%22:246,%22y%22:440%7D,%22text%22:%220,3,6,9%22%7D,%7B%22sort%22:1,%22nodeA%22:0,%22nodeB%22:1,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.4225941422594142,%22perpendicularPart%22:-23,%22text%22:%221,4,7%22%7D,%7B%22sort%22:1,%22nodeA%22:1,%22nodeB%22:2,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.4612305779987569,%22perpendicularPart%22:-35.38063151484243,%22text%22:%221,4,7%22%7D,%7B%22sort%22:1,%22nodeA%22:2,%22nodeB%22:0,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.5054092388130268,%22perpendicularPart%22:-23.177530132670874,%22text%22:%221,4,7%22%7D,%7B%22sort%22:1,%22nodeA%22:0,%22nodeB%22:2,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.6632992714322292,%22perpendicularPart%22:-13.986563597510141,%22text%22:%222,5,8%22%7D,%7B%22sort%22:1,%22nodeA%22:1,%22nodeB%22:0,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.5,%22perpendicularPart%22:-13,%22text%22:%222,5,8%22%7D,%7B%22sort%22:1,%22nodeA%22:2,%22nodeB%22:1,%22lineAngleAdjust%22:3.141592653589793,%22parallelPart%22:0.5268365444375388,%22perpendicularPart%22:-12.933675049253278,%22text%22:%222,5,8%22%7D%5D%5D">decimal</a></li>
+      <!-- <li><a href=""></a></li> -->
+		</ul>
+	</div>
+	<p>Made by Marcel Ullrich<br>
+	Based on work of Evan Wallace</p>
+</body></html>
