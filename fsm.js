@@ -1280,11 +1280,15 @@ function simulateTuringDet() {
   document.getElementById("overleafExport").style.display="none";
 }
 
+String.prototype.repeat = function(length) {
+ return Array(length + 1).join(this);
+};
 
-function simulateNFAWord(startNode, word) {
+function simulateNFAWord(startNode, word,verbose=false) {
   word=word.split('');
-  var currentNodes=[[word,startNode]];
-  var data="declined";
+  var currentNodes=[[word,startNode,0,undefined]];
+  var data="";
+  var enddata="declined";
   out:
   while(true) {
     var newNodes=[]
@@ -1293,17 +1297,29 @@ function simulateNFAWord(startNode, word) {
     for(var j=0;j<currentNodes.length;j++){
       var word=currentNodes[j][0];
       var cNode=currentNodes[j][1];
+	  var depth=currentNodes[j][2];
+	  var lastNode=currentNodes[j][3];
+	//   console.log(depth,cNode.text,word);
+		if (lastNode)
+			last="("+lastNode.text+" ->) ";
+		else
+			last="";
       if(word.length==0){
         console.log("empty in "+cNode.text);
         if(cNode.isAcceptState){
           console.log("accept");
-          data="accepted in "+cNode.text;
+          enddata="accepted in "+cNode.text;
+        //   data+="accepted in "+cNode.text+"\n";
           break out;
         }else {
+			data+=" ".repeat(depth)+last+cNode.text+": declined\n";
+        //   data+="accepted in "+cNode.text+"\n";
           // data="declined";
         }
         // break;
-      }
+      }else{
+		data+=" ".repeat(depth)+last+cNode.text+": "+word+"\n";
+	  }
       for(var i = 0; i < links.length; i++) {
         var nodeA;
         var nodeB;
@@ -1329,9 +1345,9 @@ function simulateNFAWord(startNode, word) {
             if(transitions2[l]==word[0]){
               var word2=word.slice();
               word2.shift();
-              newNodes.push([word2,nodeB]);
+              newNodes.push([word2,nodeB,depth+1,cNode]);
             }else if(transitions2[l]=="\\epsilon"){
-              newNodes.push([word,nodeB]);
+              newNodes.push([word,nodeB,depth+1,cNode]);
             }
           }
         }
@@ -1342,7 +1358,7 @@ function simulateNFAWord(startNode, word) {
     }
     currentNodes=newNodes;
   }
-  return data;
+  return data+enddata;
 }
 
 function simulateNFA() {
@@ -1362,29 +1378,32 @@ function simulateNFA() {
     data="";
     for(var i=0;i<words.length;i++){
       var word=words[i];
-      data+=word+" => "+simulateNFAWord(currentNode,word);
+	  data+=word+" => "+simulateNFAWord(currentNode,word);
+	//   console.log("NF: "+data);
       data+="\n";
     }
   }else{
     var word=document.getElementById("tapeInput").value;
-    data=simulateNFAWord(currentNode,word);
+    data=simulateNFAWord(currentNode,word,true);
   }
   output(data);
   document.getElementById("overleafExport").style.display="none";
 }
 
-function simulateDFAWord(currentNode, word) {
+function simulateDFAWord(currentNode, word,verbose=false) {
   word=word.split('');
   var data="";
   while(true) {
     if(word.length==0){
       if(currentNode.isAcceptState){
-        data="accepted in "+currentNode.text;
+        data+="accepted in "+currentNode.text;
       }else {
-        data="declined in "+currentNode.text;
+        data+="declined in "+currentNode.text;
       }
       break;
-    }
+	} else if(verbose){
+		data+=currentNode.text+": "+word.join("")+"\n";
+	}
     found=false;
     out:
     for(var i = 0; i < links.length; i++) {
@@ -1418,7 +1437,7 @@ function simulateDFAWord(currentNode, word) {
       }
     }
     if(!found){
-      data="declined in "+currentNode.text+" (no move possible)";
+      data+="declined in "+currentNode.text+" (no move possible)";
       break;
     }
   }
@@ -1447,7 +1466,7 @@ function simulateDFA() {
     }
   }else{
     var word=document.getElementById("tapeInput").value;
-    data=simulateDFAWord(currentNode,word);
+    data=simulateDFAWord(currentNode,word,true);
   }
   output(data);
   document.getElementById("overleafExport").style.display="none";
