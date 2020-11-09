@@ -210,6 +210,7 @@ function changeCanvasSize() {
      | <a href="javascript:saveAsText()">Text</a>
      | <a href="javascript:saveAsLaTeX()">LaTeX</a>
      | <a href="javascript:share()">Share</a>
+     <span id="loadSpan" style="display:none;">| <a href="javascript:load()">Import</a></span>
     </p>
 		<p class="center" id="simulatePanel">Simulate: 
      <a href="javascript:simulateTuringDet()">Run Turing</a>
@@ -229,7 +230,8 @@ function changeCanvasSize() {
       </label>
     </center>
 <form class="center" action="https://www.overleaf.com/docs" method="post" target="_blank">
-<textarea id="output" name="snip" readonly></textarea>
+<textarea id="output" name="snip" ></textarea>
+<!-- readonly -->
 <center>
 <input type="submit" value="Open in Overleaf" id="overleafExport" style="display:none;" class="btn-success btn btn-sm">
 </center>

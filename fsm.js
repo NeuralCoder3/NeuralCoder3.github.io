@@ -941,12 +941,18 @@ window.onload = function() {
 
   var code=getUrlVars()["code"];
   if(!(code===undefined)){
+	  loadCode(code);
+  }
+  document.getElementById("bulkCheck").checked=false;
+}
+
+function loadCode(code2) {
     // console.log(code);
-    code=decodeURI(code);
-    console.log(code);
+    code=decodeURI(code2);
+    // console.log(code);
     var xs = JSON.parse(code);
     // console.log(nodes);
-    console.log(xs);
+    // console.log(xs);
     nodes=[];
     for(var i=0;i<xs[0].length;i++) {
       var xNode=xs[0][i];
@@ -977,8 +983,6 @@ window.onload = function() {
     }
     drawUsing(canvas.getContext('2d'));
     // console.log(nodes);
-  }
-  document.getElementById("bulkCheck").checked=false;
 }
 
 var shift = false;
@@ -1514,8 +1518,13 @@ function saveAsLaTeX2() {
 }
 
 function getUrlVars() {
-    var vars = {};
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+	return getUriVars(window.location.href);
+}
+
+function getUriVars(url) {
+	var vars = {};
+	console.log(url);
+    var parts = url.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
         vars[key] = value;
     });
     return vars;
@@ -1532,7 +1541,17 @@ function getIndex(node) {
   return -1;
 }
 
+function load() {
+  var completeUrl=document.getElementById("output").value;
+  var code=getUriVars(completeUrl)["code"];
+//   console.log(code);
+  if(!(code===undefined)){
+	  loadCode(code);
+  }
+}
+
 function share() {
+	document.getElementById("loadSpan").style.display="";
   var shareLinks=[];
   for(var i=0;i<links.length;i++){
     if(links[i] instanceof SelfLink) {
