@@ -345,6 +345,8 @@ TemporaryLink.prototype.draw = function(c) {
 	drawArrow(c, this.to.x, this.to.y, Math.atan2(this.to.y - this.from.y, this.to.x - this.from.x));
 };
 
+startString="[S]";//{Start}
+
 // draw using this instead of a canvas and call toLaTeX() afterward
 function ExportAsLaTeX() {
 	this._points = [];
@@ -427,6 +429,7 @@ function ExportAsLaTeX() {
 		c.font = '20px "Times New Romain", serif';
 		return c.measureText(text);
 	};
+	startNode=getStart();
 	this.advancedFillText = function(text, originalText, x, y, angleOrNull) {
 		if(text.replace(' ', '').length > 0) {
 			var nodeParams = '';
@@ -445,8 +448,15 @@ function ExportAsLaTeX() {
 			}
 			x *= this._scale;
 			y *= this._scale;
-      if(originalText[0]=="S") {
-        this._texData += '\\path[decoration={markings,mark=at position 1 with \\arrow{Classical TikZ Rightarrow[length=2mm]}}, decorate] (' + fixed(x-3, 2) + ',' + fixed(-y, 2) + ');\n';
+      if(originalText==startNode.text) {
+originalText=originalText.substr(startString.length);
+
+		this._texData += '\\draw [' + this.strokeStyle + ', ->, ultra thick]';
+			this._texData += ' (' + fixed(x-5, 2) + ',' + fixed(-y, 2) + ')';
+			this._texData += ' --' + ' (' + fixed(x-3, 2) + ',' + fixed(-y, 2) + ')';
+		this._texData += ';\n';
+
+        // this._texData += '\\path[decoration={markings,mark=at position 1 with \\arrow{Classical TikZ Rightarrow[length=2mm]}}, decorate] (' + fixed(x-3, 2) + ',' + fixed(-y, 2) + ');\n';
       }
 			this._texData += '\\draw (' + fixed(x, 2) + ',' + fixed(-y, 2) + ') node ' + nodeParams + '{$' + originalText.replace(/#/g,'\\#').replace(/\\\\/g,'$\\\\$').replace(/ /g, '\\mbox{ }') + '$};\n';
 		}
@@ -1248,16 +1258,21 @@ function calcTape(tapeLeft,tapeRight){
   return tape;
 }
 
-// function simulateTuringDetWord(currentNode, word, blank, verbose) {
-function simulateTuringDet() {
+function getStart() {
   var currentNode;
 	for(var i = 0; i < nodes.length; i++) {
-    if(nodes[i].text=="S"){
-      currentNode=nodes[i];
-    }
+		if((undefined===currentNode && nodes[i].text=="S") || nodes[i].text.toLowerCase().startsWith(startString.toLowerCase())){
+			currentNode=nodes[i];
+		}
 	}
+	return currentNode;
+}
+
+// function simulateTuringDetWord(currentNode, word, blank, verbose) {
+function simulateTuringDet() {
+  var currentNode=getStart();
   if(undefined === currentNode){
-    alert("No starting node S found!");
+    alert("No starting node S or \""+startString+"\" found!");
   }
 
   if(undefined === document.blank) {
@@ -1366,14 +1381,9 @@ function simulateNFAWord(startNode, word,verbose=false) {
 }
 
 function simulateNFA() {
-  var currentNode;
-	for(var i = 0; i < nodes.length; i++) {
-    if(nodes[i].text=="S"){
-      currentNode=nodes[i];
-    }
-	}
+  var currentNode=getStart();
   if(undefined === currentNode){
-    alert("No starting node S found!");
+    alert("No starting node S or \""+startString+"\" found!");
   }
   var data;
   var bulk=document.getElementById("bulkCheck").checked;
@@ -1449,14 +1459,9 @@ function simulateDFAWord(currentNode, word,verbose=false) {
 }
 
 function simulateDFA() {
-  var currentNode;
-	for(var i = 0; i < nodes.length; i++) {
-    if(nodes[i].text=="S"){
-      currentNode=nodes[i];
-    }
-	}
+  var currentNode=getStart();
   if(undefined === currentNode){
-    alert("No starting node S found!");
+    alert("No starting node S or \""+startString+"\" found!");
   }
   var data;
   var bulk=document.getElementById("bulkCheck").checked;
