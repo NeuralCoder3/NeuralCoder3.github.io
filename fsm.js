@@ -178,6 +178,16 @@ Node.prototype.draw = function(c) {
 		c.arc(this.x, this.y, nodeRadius - 6, 0, 2 * Math.PI, false);
 		c.stroke();
 	}
+
+	var startNode=getStart();
+	if(this.text==startNode.text) {
+	// drawText(c, this.text, this.x+1, this.y, null, selectedObject == this);
+		drawArrow(c, this.x-nodeRadius, this.y, 0);
+		c.beginPath();
+		c.moveTo(this.x-nodeRadius, this.y);
+		c.lineTo(this.x-1.7*nodeRadius, this.y);
+		c.stroke();
+	}
 };
 
 Node.prototype.closestPointOnCircle = function(x, y) {
@@ -448,16 +458,16 @@ function ExportAsLaTeX() {
 			}
 			x *= this._scale;
 			y *= this._scale;
-      if(originalText==startNode.text) {
-originalText=originalText.substr(startString.length);
+//       if(originalText==startNode.text) {
+// originalText=originalText.substr(startString.length);
 
-		this._texData += '\\draw [' + this.strokeStyle + ', ->, ultra thick]';
-			this._texData += ' (' + fixed(x-5, 2) + ',' + fixed(-y, 2) + ')';
-			this._texData += ' --' + ' (' + fixed(x-3, 2) + ',' + fixed(-y, 2) + ')';
-		this._texData += ';\n';
+// 		this._texData += '\\draw [' + this.strokeStyle + ', ->, ultra thick]';
+// 			this._texData += ' (' + fixed(x-5, 2) + ',' + fixed(-y, 2) + ')';
+// 			this._texData += ' --' + ' (' + fixed(x-3, 2) + ',' + fixed(-y, 2) + ')';
+// 		this._texData += ';\n';
 
-        // this._texData += '\\path[decoration={markings,mark=at position 1 with \\arrow{Classical TikZ Rightarrow[length=2mm]}}, decorate] (' + fixed(x-3, 2) + ',' + fixed(-y, 2) + ');\n';
-      }
+//         // this._texData += '\\path[decoration={markings,mark=at position 1 with \\arrow{Classical TikZ Rightarrow[length=2mm]}}, decorate] (' + fixed(x-3, 2) + ',' + fixed(-y, 2) + ');\n';
+//       }
 			this._texData += '\\draw (' + fixed(x, 2) + ',' + fixed(-y, 2) + ') node ' + nodeParams + '{$' + originalText.replace(/#/g,'\\#').replace(/\\\\/g,'$\\\\$').replace(/ /g, '\\mbox{ }') + '$};\n';
 		}
 	};
