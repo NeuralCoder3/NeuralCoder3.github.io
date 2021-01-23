@@ -180,7 +180,7 @@ Node.prototype.draw = function(c) {
 	}
 
 	var startNode=getStart();
-	if(this.text==startNode.text) {
+	if(startNode!==undefined && this.text==startNode.text) {
 	// drawText(c, this.text, this.x+1, this.y, null, selectedObject == this);
 		drawArrow(c, this.x-nodeRadius, this.y, 0);
 		c.beginPath();
