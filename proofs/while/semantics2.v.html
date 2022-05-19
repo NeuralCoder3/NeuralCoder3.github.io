@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html class="alectryon-standalone"><head><title>semantics2.v</title><meta charset="utf-8"><meta content="Alectryon" name="generator"><meta name="viewport" content="width=device-width, initial-scale=1"><link href="alectryon.css" rel="stylesheet"><link href="pygments.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/IBM-type/0.5.4/css/ibm-type.min.css" integrity="sha512-sky5cf9Ts6FY1kstGOBHSybfKqdHR41M0Ldb0BjNiv3ifltoQIsg0zIaQ+wwdwgQ0w9vKFW7Js50lxH9vqNSSw==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/firacode/5.2.0/fira_code.min.css" integrity="sha512-MbysAYimH1hH2xYzkkMHB6MqxBqfP0megxsCLknbYqHVwXTCg9IqHbk+ZP/vnhO8UEW6PaXAkKe2vQ+SWACxxA==" crossorigin="anonymous" /><script src="alectryon.js"></script></head><body><article class="alectryon-root alectryon-centered"><div class="alectryon-banner">Built with <a href="https://github.com/cpitclaudel/alectryon/">Alectryon</a>, running Coq+SerAPI v8.13.0+0.13.0. Bubbles (<span class="alectryon-bubble"></span>) indicate interactive fragments: hover for details, tap to reveal contents. Use <kbd>Ctrl+↑</kbd> <kbd>Ctrl+↓</kbd> to navigate, <kbd>Ctrl+🖱️</kbd> to focus. On Mac, use <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>.</div><pre class="alectryon-io highlight"><!-- Generator: Alectryon --><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Load</span> syntax2.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Variant</span> <span class="nf">UndefVal</span> :=
+    | Undef
+    | <span class="kn">Defined</span> (v:Val)
+    .</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="nf">VarEnv</span> := (VarT -&gt; option Addr).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="nf">MemEnv</span> := (Addr -&gt; option UndefVal).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+<span class="c">(* Record State :=</span>
+<span class="c">    {</span>
+<span class="c">        var_assign: VarEnv;</span>
+<span class="c">        memory_assign: MemEnv</span>
+<span class="c">    }. *)</span>
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">State</span> := (list VarEnv * MemEnv)%type.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Implicit Type</span> (ρ:VarEnv) (μ:MemEnv) (σ:State).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Load</span> option_monad.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Fixpoint</span> <span class="nf">lookupStack</span> {<span class="nv">A</span> <span class="nv">B</span>} (<span class="nv">stack</span>:list (A -&gt; option B)) (<span class="nv">v</span>:A) :=
+    <span class="kr">match</span> stack <span class="kr">with</span>
+    | [] =&gt; None
+    | hd::tl =&gt;
+        <span class="kr">match</span> hd v <span class="kr">with</span>
+        | None =&gt; lookupStack tl v
+        | Some a =&gt; Some a
+        <span class="kr">end</span>
+    <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">ρ</span> <span class="nv">σ</span> := lookupStack (fst σ).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">μ</span> <span class="nv">σ</span> := snd σ.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">lookupVar</span> <span class="nv">σ</span> <span class="nv">x</span> :=
+    a &lt;- ρ σ x;;
+    μ σ a.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">LExprEval</span> (<span class="nv">l</span>:LExpr) (<span class="nv">σ</span>:State) : option Addr :=
+    <span class="kr">match</span> l <span class="kr">with</span>
+    | Var x =&gt; ρ σ x
+    <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">evalOp</span> (<span class="nv">op</span>:Op) (<span class="nv">v1</span> <span class="nv">v2</span>:Val) : option Val :=
+    <span class="kr">match</span> op, v1,v2 <span class="kr">with</span> 
+    | <span class="kn">Add</span>, IntVal i1, IntVal i2 =&gt; Some (IntVal (i1+i2))
+    | Sub, IntVal i1, IntVal i2 =&gt; Some (IntVal (i1-i2))
+    | Mul, IntVal i1, IntVal i2 =&gt; Some (IntVal (i1*i2))
+    | Ge , IntVal i1, IntVal i2 =&gt; Some (IntVal (<span class="kr">if</span> Nat.leb i2 i1 <span class="kr">then</span> <span class="mi">1</span> <span class="kr">else</span> <span class="mi">0</span>))
+    | Eq , IntVal i1, IntVal i2 =&gt; Some (IntVal (<span class="kr">if</span> Nat.eqb i1 i2 <span class="kr">then</span> <span class="mi">1</span> <span class="kr">else</span> <span class="mi">0</span>))
+    | _, _, _ =&gt; None
+    <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Fixpoint</span> <span class="nf">ExprEval</span> (<span class="nv">e</span>:Expr) (<span class="nv">σ</span>:State) : option Val :=
+    <span class="kr">match</span> e <span class="kr">with</span> 
+    | Const c =&gt; ret c
+    | LVal l =&gt; 
+        a &lt;- LExprEval l σ;;
+        uv &lt;- μ σ a;;
+        <span class="kr">match</span> uv <span class="kr">with</span> 
+        | Undef =&gt; None
+        | <span class="kn">Defined</span> v =&gt;
+            ret v
+        <span class="kr">end</span>
+    | Binary op e1 e2 =&gt;
+        v1 &lt;- ExprEval e1 σ;;
+        v2 &lt;- ExprEval e2 σ;;
+        evalOp op v1 v2
+    <span class="kr">end</span>
+    .</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Variant</span> <span class="nf">Conf</span> :=
+    | Aborted
+    | Terminated (s:State)
+    | Running (smt:Program) (s:State)
+    .</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Class</span> <span class="nf">EqDec</span> (<span class="nv">A</span>:<span class="kt">Type</span>) :=
+    {eqdec:(<span class="kr">forall</span> (<span class="nv">x</span> <span class="nv">y</span>:A), {x = y} + {x&lt;&gt;y})}.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">update</span> {<span class="nv">A</span> <span class="nv">B</span>} {<span class="nv">Aeq</span>:EqDec A} (<span class="nv">f</span>:A -&gt; B) (<span class="nv">x</span>:A) (<span class="nv">y</span>:B) (<span class="nv">x2</span>:A) : B :=
+        <span class="kr">if</span> @eqdec A Aeq x x2 <span class="kr">then</span> y <span class="kr">else</span> f x2.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><input class="alectryon-toggle" id="semantics2-v-chk0" style="display: none" type="checkbox"><label class="alectryon-input" for="semantics2-v-chk0"><span class="kn">Instance</span> <span class="nf">AddrEq</span> : EqDec Addr.</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><span class="goal-separator"><hr></span><div class="goal-conclusion">EqDec Addr</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><input class="alectryon-toggle" id="semantics2-v-chk1" style="display: none" type="checkbox"><label class="alectryon-input" for="semantics2-v-chk1"><span class="nb">constructor</span>.</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><span class="goal-separator"><hr></span><div class="goal-conclusion"><span class="kr">forall</span> <span class="nv">x</span> <span class="nv">y</span> : Addr, {x = y} + {x &lt;&gt; y}</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="bp">now</span> <span class="bp">decide equality</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Defined</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="nf">RExprEval</span> := ExprEval.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="s2">&quot;⟨ s | st ⟩&quot;</span> := (Running s st).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="s2">&quot;« st »&quot;</span> := (Terminated st).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="s2">&quot;R⟦ e ⟧ σ&quot;</span> := (ExprEval e σ) (<span class="kn">at level</span> <span class="mi">40</span>).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="s2">&quot;L⟦ l ⟧ σ&quot;</span> := (LExprEval l σ) (<span class="kn">at level</span> <span class="mi">40</span>).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="s2">&quot;↯&quot;</span> := (Aborted).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Coercion</span> <span class="nf">Terminated</span> : State &gt;-&gt; Conf.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">bool_to_nat</span> (<span class="nv">b</span>:bool) := 
+    <span class="kr">if</span> b <span class="kr">then</span> <span class="mi">1</span> <span class="kr">else</span> <span class="mi">0</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Coercion</span> <span class="nf">bool_to_nat</span> : bool &gt;-&gt; nat.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Coercion</span> <span class="nf">IntVal</span> : nat &gt;-&gt; Val.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Coercion</span> <span class="nf">Defined</span> : Val &gt;-&gt; UndefVal.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp"><span class="c">(* Coercion Some : UndefVal &gt;-&gt; (option UndefVal). *)</span>
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Open Scope</span> string.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="s2">&quot;△&quot;</span> := Triangle.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="s2">&quot;○&quot;</span> := Circle.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="s2">&quot;■&quot;</span> := GarbageCollect.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><input class="alectryon-toggle" id="semantics2-v-chk2" style="display: none" type="checkbox"><label class="alectryon-input" for="semantics2-v-chk2"><span class="kn">Instance</span> <span class="nf">eqString</span> : EqDec string.</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><span class="goal-separator"><hr></span><div class="goal-conclusion">EqDec string</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><input class="alectryon-toggle" id="semantics2-v-chk3" style="display: none" type="checkbox"><label class="alectryon-input" for="semantics2-v-chk3"><span class="nb">constructor</span>.</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><span class="goal-separator"><hr></span><div class="goal-conclusion"><span class="kr">forall</span> <span class="nv">x</span> <span class="nv">y</span> : string, {x = y} + {x &lt;&gt; y}</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kp">repeat</span> <span class="bp">decide equality</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Defined</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="s2">&quot;f [ x ↦ y ]&quot;</span> := (update f x y) (<span class="kn">at level</span> <span class="mi">10</span>).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">emptyEnv</span> {<span class="nv">A</span>} {<span class="nv">B</span>} (<span class="nv">a</span>:A) : option B := None.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Reserved Notation</span> <span class="s2">&quot;c1 ~&gt; c2&quot;</span> (<span class="kn">at level</span> <span class="mi">50</span>).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Inductive</span> <span class="nf">step</span> : Conf -&gt; Conf -&gt; <span class="kt">Prop</span> :=
+    | AssignStep l e ρs μ a v p: 
+        <span class="kr">let</span> <span class="nv">σ</span> := (ρs, μ) <span class="kr">in</span>
+        R⟦e⟧σ = Some v -&gt;
+        L⟦l⟧σ = Some a -&gt;
+        ⟨ (Assign l e)::p | σ ⟩ ~&gt; ⟨ p | (ρs, μ [a ↦ Some (<span class="kn">Defined</span> v)])  ⟩
+    | IfTrueStep e s1 s2 σ (n:nat) p:
+        R⟦e⟧σ = Some (n:Val) -&gt;
+        n &lt;&gt; <span class="mi">0</span> -&gt;
+        ⟨ (If e s1 s2)::p | σ ⟩ ~&gt; ⟨ s1::p | σ ⟩
+    | IfFalseStep e s1 s2 σ p:
+        R⟦e⟧σ = Some (<span class="mi">0</span>:Val) -&gt;
+        ⟨ (If e s1 s2)::p | σ ⟩ ~&gt; ⟨ s2::p | σ ⟩
+    | WhileTrueStep e s σ (n:nat) p:
+        R⟦e⟧σ = Some (n:Val) -&gt;
+        n &lt;&gt; <span class="mi">0</span> -&gt;
+        ⟨ (While e s)::p | σ ⟩ ~&gt; ⟨ s :: While e s :: p | σ ⟩
+    | WhileFalseStep e s σ p:
+        R⟦e⟧σ = Some (<span class="mi">0</span>:Val) -&gt;
+        ⟨ (While e s)::p | σ ⟩ ~&gt; ⟨ p | σ ⟩
+    | EmptyStep σ :
+        ⟨ [] | σ ⟩ ~&gt; « σ »
+    | BlockStep p q ρs μ:
+        <span class="kr">let</span> <span class="nv">σ</span> := (ρs, μ) <span class="kr">in</span>
+        ⟨ Block q :: p | σ ⟩ ~&gt; ⟨ (p ++ [■] ++ q)%list | (emptyEnv::ρs,μ) ⟩
+    | GarbageCollectStep p ρ ρs μ :
+        ⟨ ■ :: p | (ρ::ρs, μ) ⟩ ~&gt; ⟨ p | (ρs,μ) ⟩
+    | AbortStep σ p :
+        ⟨ <span class="kn">Abort</span>::p | σ ⟩ ~&gt; ↯
+    <span class="kn">where</span> <span class="s2">&quot;c1 ~&gt; c2&quot;</span> := (step c1 c2).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">terminal</span> (<span class="nv">c</span>:Conf) :=
+    ~(<span class="kr">exists</span> (<span class="nv">c&#39;</span>:Conf), c ~&gt; c&#39;).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Reserved Notation</span> <span class="s2">&quot;conf1 ⇓ conf2&quot;</span> (<span class="kn">at level</span> <span class="mi">50</span>).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Inductive</span> <span class="nf">bigStep</span> : Conf -&gt; Conf -&gt; <span class="kt">Prop</span> :=
+    | BigStepEnd (c1:Conf) :
+        terminal c1 -&gt;
+        c1 ⇓ c1
+    | BigStepTrans (c1 c2 c3:Conf):
+        c1 ~&gt; c2 -&gt;
+        c2 ⇓ c3 -&gt;
+        c1 ⇓ c3
+    <span class="kn">where</span> <span class="s2">&quot;conf1 ⇓ conf2&quot;</span> := (bigStep conf1 conf2).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">properTerm</span> <span class="nv">p</span> <span class="nv">σ</span> <span class="nv">σ&#39;</span> :=
+    ⟨ p | σ ⟩ ⇓ σ&#39;.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">abortion</span> <span class="nv">p</span> <span class="nv">σ</span> :=
+    ⟨ p | σ ⟩ ⇓ ↯.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">stuck</span> <span class="nv">p</span> <span class="nv">σ</span> <span class="nv">p&#39;</span> <span class="nv">σ&#39;</span> :=
+    ⟨ p | σ ⟩ ⇓ ⟨ p&#39; | σ&#39; ⟩.</span></span></pre></article></body></html>

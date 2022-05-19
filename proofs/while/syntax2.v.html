@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html class="alectryon-standalone"><head><title>syntax2.v</title><meta charset="utf-8"><meta content="Alectryon" name="generator"><meta name="viewport" content="width=device-width, initial-scale=1"><link href="alectryon.css" rel="stylesheet"><link href="pygments.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/IBM-type/0.5.4/css/ibm-type.min.css" integrity="sha512-sky5cf9Ts6FY1kstGOBHSybfKqdHR41M0Ldb0BjNiv3ifltoQIsg0zIaQ+wwdwgQ0w9vKFW7Js50lxH9vqNSSw==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/firacode/5.2.0/fira_code.min.css" integrity="sha512-MbysAYimH1hH2xYzkkMHB6MqxBqfP0megxsCLknbYqHVwXTCg9IqHbk+ZP/vnhO8UEW6PaXAkKe2vQ+SWACxxA==" crossorigin="anonymous" /><script src="alectryon.js"></script></head><body><article class="alectryon-root alectryon-centered"><div class="alectryon-banner">Built with <a href="https://github.com/cpitclaudel/alectryon/">Alectryon</a>, running Coq+SerAPI v8.13.0+0.13.0. Bubbles (<span class="alectryon-bubble"></span>) indicate interactive fragments: hover for details, tap to reveal contents. Use <kbd>Ctrl+↑</kbd> <kbd>Ctrl+↓</kbd> to navigate, <kbd>Ctrl+🖱️</kbd> to focus. On Mac, use <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>.</div><pre class="alectryon-io highlight"><!-- Generator: Alectryon --><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Require Import</span> String.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Require Import</span> List.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Require Import</span> Nat.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Import</span> ListNotations.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">VarT</span> := string.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp"><span class="c">(* Definition Addr := nat. *)</span>
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Variant</span> <span class="nf">Addr</span> := Triangle | Circle | Pentagon | Square.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Variant</span> <span class="nf">Val</span> :=
+    | AddrVal (addr: Addr)
+    | IntVal (v: nat).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Variant</span> <span class="nf">Op</span> := 
+    <span class="kn">Add</span> | Mul | Sub | Ge | Eq.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp"><span class="c">(* define Ge with Lt &amp; Eq &amp; Not *)</span>
+    <span class="c">(* Lt Eq *)</span>
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Inductive</span> <span class="nf">Expr</span> :=
+    | Const (c:Val)
+    | Binary (o:Op) (e1 e2:Expr)
+    | LVal (l:LExpr)
+<span class="kr">with</span> LExpr :=
+    | Var (v:VarT)
+    .</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Implicit Type</span> (e : Expr) (c : Val) (x y : VarT).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Inductive</span> <span class="nf">Stmt</span> :=
+    <span class="c">(* | Assume e *)</span>
+    <span class="c">(* | Assert e *)</span>
+    | While e (s:Stmt)
+    | If e (s_then s_else : Stmt)
+    | Block (h:list Stmt)
+    | Assign (x:LExpr) e
+    | GarbageCollect <span class="c">(* do not use to construct programs *)</span>
+    | <span class="kn">Abort</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">Program</span> := list Stmt.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp"><span class="c">(*</span>
+<span class="c">we do not need explicit </span>
+<span class="c">    Block (h:Program)</span>
+<span class="c">    Program := Prog (b:list Stmt)</span>
+<span class="c">*)</span>
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Implicit Type</span> (ss : list Stmt) (s:Stmt).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+
+
+</span></pre></article></body></html>
