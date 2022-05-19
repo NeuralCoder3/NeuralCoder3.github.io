@@ -20,33 +20,6 @@
 </span></span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="nb">inversion</span> H.</span><span class="alectryon-wsp">
 </span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Qed</span>.</span><span class="alectryon-wsp">
 </span></span><span class="alectryon-wsp">
-<span class="c">(* Goal forall l e σ,</span>
-<span class="c">let s := Assign l e in</span>
-<span class="c">    (exists σ&#39;, properTerm s σ σ&#39;) \/</span>
-<span class="c">    (exists s&#39; σ&#39;, stuck s σ s&#39; σ&#39;).</span>
-<span class="c">Proof.</span>
-<span class="c">  intros x e σ;cbn.</span>
-<span class="c">  destruct (R⟦ e ⟧ σ) eqn:He, (L⟦ x ⟧ σ) eqn:Hx;</span>
-<span class="c">  destruct σ as [ρ μ]. </span>
-<span class="c">  2-4: </span>
-<span class="c">    right; exists (Assign x e); exists (ρ,μ);</span>
-<span class="c">    apply BigStepEnd; intros [c&#39; H];</span>
-<span class="c">    inversion H;subst; subst σ0; congruence.</span>
-<span class="c">  left.</span>
-<span class="c">  eexists. </span>
-<span class="c">  eapply BigStepTrans.</span>
-<span class="c">  * apply AssignStep;now eassumption.</span>
-<span class="c">  * apply BigStepEnd. apply terminalTerminated.</span>
-<span class="c">Qed.</span>
-
-<span class="c">Goal forall σ,</span>
-<span class="c">    abortion (Abort) σ.</span>
-<span class="c">Proof.</span>
-<span class="c">    intros.</span>
-<span class="c">    eapply BigStepTrans;[constructor|apply BigStepEnd].</span>
-<span class="c">    apply terminalAbortion.</span>
-<span class="c">Qed. *)</span>
-
 
 </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Section</span> <span class="nf">Exercise6_9</span>.</span><span class="alectryon-wsp">
 </span></span><span class="alectryon-wsp">
