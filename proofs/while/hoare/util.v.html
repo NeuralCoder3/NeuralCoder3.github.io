@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html class="alectryon-standalone"><head><title>util.v</title><meta charset="utf-8"><meta content="Alectryon" name="generator"><meta name="viewport" content="width=device-width, initial-scale=1"><link href="alectryon.css" rel="stylesheet"><link href="pygments.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/IBM-type/0.5.4/css/ibm-type.min.css" integrity="sha512-sky5cf9Ts6FY1kstGOBHSybfKqdHR41M0Ldb0BjNiv3ifltoQIsg0zIaQ+wwdwgQ0w9vKFW7Js50lxH9vqNSSw==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/firacode/5.2.0/fira_code.min.css" integrity="sha512-MbysAYimH1hH2xYzkkMHB6MqxBqfP0megxsCLknbYqHVwXTCg9IqHbk+ZP/vnhO8UEW6PaXAkKe2vQ+SWACxxA==" crossorigin="anonymous" /><script src="alectryon.js"></script></head><body><article class="alectryon-root alectryon-centered"><div class="alectryon-banner">Built with <a href="https://github.com/cpitclaudel/alectryon/">Alectryon</a>, running Coq+SerAPI v8.13.0+0.13.0. Bubbles (<span class="alectryon-bubble"></span>) indicate interactive fragments: hover for details, tap to reveal contents. Use <kbd>Ctrl+↑</kbd> <kbd>Ctrl+↓</kbd> to navigate, <kbd>Ctrl+🖱️</kbd> to focus. On Mac, use <kbd>⌘</kbd> instead of <kbd>Ctrl</kbd>.</div><pre class="alectryon-io highlight"><!-- Generator: Alectryon --><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Require Import</span> String.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Require Import</span> List.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Import</span> ListNotations.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Arguments</span> Some [A] _.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Arguments</span> None {A}.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">ret</span> {<span class="nv">A</span> : <span class="kt">Type</span>} (<span class="nv">x</span> : A) := Some x.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp"> 
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">bind</span> {<span class="nv">A</span> <span class="nv">B</span> : <span class="kt">Type</span>} (<span class="nv">a</span> : option A) (<span class="nv">f</span> : A -&gt; option B) : option B :=
+  <span class="kr">match</span> a <span class="kr">with</span>
+    | Some x =&gt; f x
+    | None =&gt; None
+  <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="s2">&quot;A &gt;&gt;= F&quot;</span> := (bind A F) (<span class="kn">at level</span> <span class="mi">42</span>, <span class="kn">left associativity</span>).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Notation</span> <span class="s2">&quot;X &lt;- A ;; B&quot;</span> := (bind A (<span class="kr">fun</span> <span class="nv">X</span> =&gt; B)) 
+    (<span class="kn">at level</span> <span class="mi">61</span>, A <span class="kn">at next level</span>, <span class="kn">right associativity</span>).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><input class="alectryon-toggle" id="util-v-chk0" style="display: none" type="checkbox"><label class="alectryon-input" for="util-v-chk0"><span class="kn">Lemma</span> <span class="nf">mon_left_id</span> : <span class="kr">forall</span> (<span class="nv">A</span> <span class="nv">B</span> : <span class="kt">Type</span>) (<span class="nv">a</span> : A) (<span class="nv">f</span> : A -&gt; option B),
+  ret a &gt;&gt;= f = f a.</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><span class="goal-separator"><hr></span><div class="goal-conclusion"><span class="kr">forall</span> (<span class="nv">A</span> <span class="nv">B</span> : <span class="kt">Type</span>) (<span class="nv">a</span> : A) (<span class="nv">f</span> : A -&gt; option B),
+X &lt;- ret a;; f X = f a</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><input class="alectryon-toggle" id="util-v-chk1" style="display: none" type="checkbox"><label class="alectryon-input" for="util-v-chk1"><span class="nb">intros</span>.</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><div class="goal-hyps"><span><var>A, B</var><span class="hyp-type"><b>: </b><span><span class="kt">Type</span></span></span></span><br><span><var>a</var><span class="hyp-type"><b>: </b><span>A</span></span></span><br><span><var>f</var><span class="hyp-type"><b>: </b><span>A -&gt; option B</span></span></span><br></div><span class="goal-separator"><hr></span><div class="goal-conclusion">X &lt;- ret a;; f X = f a</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="bp">reflexivity</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Qed</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp"> 
+</span><span class="alectryon-sentence"><input class="alectryon-toggle" id="util-v-chk2" style="display: none" type="checkbox"><label class="alectryon-input" for="util-v-chk2"><span class="kn">Lemma</span> <span class="nf">mon_right_id</span> : <span class="kr">forall</span> (<span class="nv">A</span> : <span class="kt">Type</span>) (<span class="nv">a</span> : option A),
+  a &gt;&gt;= ret = a.</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><span class="goal-separator"><hr></span><div class="goal-conclusion"><span class="kr">forall</span> (<span class="nv">A</span> : <span class="kt">Type</span>) (<span class="nv">a</span> : option A), X &lt;- a;; ret X = a</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><input class="alectryon-toggle" id="util-v-chk3" style="display: none" type="checkbox"><label class="alectryon-input" for="util-v-chk3"><span class="nb">intros</span>.</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><div class="goal-hyps"><span><var>A</var><span class="hyp-type"><b>: </b><span><span class="kt">Type</span></span></span></span><br><span><var>a</var><span class="hyp-type"><b>: </b><span>option A</span></span></span><br></div><span class="goal-separator"><hr></span><div class="goal-conclusion">X &lt;- a;; ret X = a</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="nb">induction</span> a; <span class="kp">repeat</span> <span class="bp">reflexivity</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Qed</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp"> 
+</span><span class="alectryon-sentence"><input class="alectryon-toggle" id="util-v-chk4" style="display: none" type="checkbox"><label class="alectryon-input" for="util-v-chk4"><span class="kn">Lemma</span> <span class="nf">mon_assoc</span> :
+  <span class="kr">forall</span> (<span class="nv">A</span> <span class="nv">B</span> <span class="nv">C</span> : <span class="kt">Type</span>) (<span class="nv">a</span> : option A) (<span class="nv">f</span> : A -&gt; option B) (<span class="nv">g</span> : B -&gt; option C),
+    (a &gt;&gt;= f) &gt;&gt;= g = a &gt;&gt;= (<span class="kr">fun</span> (<span class="nv">x</span>:A) =&gt; f x &gt;&gt;= g).</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><span class="goal-separator"><hr></span><div class="goal-conclusion"><span class="kr">forall</span> (<span class="nv">A</span> <span class="nv">B</span> <span class="nv">C</span> : <span class="kt">Type</span>) (<span class="nv">a</span> : option A)
+  (<span class="nv">f</span> : A -&gt; option B) (<span class="nv">g</span> : B -&gt; option C),
+X &lt;- (X &lt;- a;; f X);; g X = x &lt;- a;; X &lt;- f x;; g X</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><input class="alectryon-toggle" id="util-v-chk5" style="display: none" type="checkbox"><label class="alectryon-input" for="util-v-chk5"><span class="nb">intros</span>.</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><div class="goal-hyps"><span><var>A, B, C</var><span class="hyp-type"><b>: </b><span><span class="kt">Type</span></span></span></span><br><span><var>a</var><span class="hyp-type"><b>: </b><span>option A</span></span></span><br><span><var>f</var><span class="hyp-type"><b>: </b><span>A -&gt; option B</span></span></span><br><span><var>g</var><span class="hyp-type"><b>: </b><span>B -&gt; option C</span></span></span><br></div><span class="goal-separator"><hr></span><div class="goal-conclusion">X &lt;- (X &lt;- a;; f X);; g X = x &lt;- a;; X &lt;- f x;; g X</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="nb">induction</span> a; <span class="kp">repeat</span> <span class="bp">reflexivity</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Qed</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+
+
+
+
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Class</span> <span class="nf">EqDec</span> (<span class="nv">A</span>:<span class="kt">Type</span>) :=
+    {eqdec:(<span class="kr">forall</span> (<span class="nv">x</span> <span class="nv">y</span>:A), {x = y} + {x&lt;&gt;y})}.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">eqb</span> {<span class="nv">A</span>} {<span class="nv">H</span>:EqDec A} (<span class="nv">x</span> <span class="nv">y</span> : A) : bool :=
+  <span class="kr">if</span> @eqdec A H x y <span class="kr">then</span> true <span class="kr">else</span> false.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><input class="alectryon-toggle" id="util-v-chk6" style="display: none" type="checkbox"><label class="alectryon-input" for="util-v-chk6"><span class="kn">Instance</span> <span class="nf">StringEq</span> : EqDec string.</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><span class="goal-separator"><hr></span><div class="goal-conclusion">EqDec string</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><input class="alectryon-toggle" id="util-v-chk7" style="display: none" type="checkbox"><label class="alectryon-input" for="util-v-chk7"><span class="nb">constructor</span>.</label><small class="alectryon-output"><div><div class="alectryon-goals"><blockquote class="alectryon-goal"><span class="goal-separator"><hr></span><div class="goal-conclusion"><span class="kr">forall</span> <span class="nv">x</span> <span class="nv">y</span> : string, {x = y} + {x &lt;&gt; y}</div></blockquote></div></div></small><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kp">repeat</span> <span class="bp">decide equality</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Defined</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+<span class="c">(* or use find *)</span>
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">mem</span> {<span class="nv">A</span>} {<span class="nv">AEq</span>:EqDec A} (<span class="nv">a</span>:A) (<span class="nv">xs</span>:list A) := 
+    existsb (<span class="kr">fun</span> <span class="nv">x</span> =&gt; eqb x a) xs.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">fold_left_i</span> {<span class="nv">A</span> <span class="nv">B</span>:<span class="kt">Type</span>} (<span class="nv">f</span>: A -&gt; B -&gt; nat -&gt; A) (<span class="nv">xs</span>:list B) (<span class="nv">a</span>:A) : A :=
+    fst (fold_left (<span class="kr">fun</span> &#39;(a,i) <span class="nv">b</span> =&gt; (f a b i, S i) ) xs (a,<span class="mi">0</span>)).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Section</span> <span class="nf">Environments</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Context</span> {<span class="nv">dom</span> <span class="nv">codom</span>:<span class="kt">Type</span>}.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Context</span> `{EqDec dom}.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">Env</span> := list (dom * codom).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">lookup</span> (<span class="nv">e</span>:Env) <span class="nv">a</span> :=
+        r &lt;- find (<span class="kr">fun</span> (<span class="nv">d</span>:dom * codom) =&gt; eqb (fst d) a) e;;
+        Some (snd r).</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Fixpoint</span> <span class="nf">lookupStack</span> (<span class="nv">stack</span>:list Env) (<span class="nv">v</span>:dom) :=
+        <span class="kr">match</span> stack <span class="kr">with</span>
+        | [] =&gt; None
+        | hd::tl =&gt;
+            <span class="kr">match</span> lookup hd v <span class="kr">with</span>
+            | None =&gt; lookupStack tl v
+            | Some a =&gt; Some a
+            <span class="kr">end</span>
+        <span class="kr">end</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+    <span class="c">(* needs list representation *)</span>
+</span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">getCodom</span> (<span class="nv">e</span>:Env) : list codom :=
+        map (<span class="kr">fun</span> (<span class="nv">d</span>:dom * codom) =&gt; snd d) e.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">getDom</span> (<span class="nv">e</span>:Env) : list dom :=
+        map (<span class="kr">fun</span> (<span class="nv">d</span>:dom * codom) =&gt; fst d) e.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">undef</span> (<span class="nv">e</span>:Env) (<span class="nv">xs</span>:list dom) : Env :=
+        filter (<span class="kr">fun</span> (<span class="nv">d</span>:dom * codom) =&gt;
+            negb (mem (fst d) xs)) e.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">update</span> (<span class="nv">f</span>:Env) (<span class="nv">x</span>:dom) (<span class="nv">y</span>:codom) :=
+        (x,y) :: f.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">    <span class="c">(* if @eqdec A Aeq x x2 then y else f x2. *)</span>
+
+</span><span class="alectryon-wsp">    </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Definition</span> <span class="nf">emptyEnv</span> : Env := [].</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">End</span> <span class="nf">Environments</span>.</span><span class="alectryon-wsp">
+</span></span><span class="alectryon-wsp">
+</span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Global</span> <span class="kn">Arguments</span> Env dom codom : <span class="kn">clear implicits</span>.</span></span></pre></article></body></html>
