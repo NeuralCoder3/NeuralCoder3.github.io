@@ -213,6 +213,7 @@
 </span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Reserved Notation</span> <span class="s2">&quot;⟨ s | σ ⟩ ⇓B conf2&quot;</span> (<span class="kn">at level</span> <span class="mi">50</span>).</span><span class="alectryon-wsp">
 </span></span><span class="alectryon-sentence"><span class="alectryon-input"><span class="kn">Inductive</span> <span class="nf">properBigStep</span> : Stmt -&gt; State -&gt; Conf -&gt; <span class="kt">Prop</span> :=
     | BigStepAssume e σ :
+        σ ⊨ e -&gt;
         ⟨Assume e | σ⟩ ⇓B « σ »
     | BigStepAssert e σ :
         ⟨Assert e | σ⟩ ⇓B « σ »
